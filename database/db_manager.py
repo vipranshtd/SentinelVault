@@ -35,7 +35,22 @@ def init_db(database_path):
     try:
         connection.execute("PRAGMA foreign_keys = ON")
         connection.executescript(schema)
+
+        columns = {
+            row[1]
+            for row in connection.execute(
+                "PRAGMA table_info(files)"
+            ).fetchall()
+        }
+
+        for column in ("nonce", "key_nonce", "wrapped_key"):
+            if column not in columns:
+                connection.execute(
+                    f"ALTER TABLE files ADD COLUMN {column} BLOB"
+                )
+
         connection.commit()
+
     finally:
         connection.close()
 

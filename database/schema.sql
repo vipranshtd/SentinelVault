@@ -22,6 +22,9 @@ CREATE TABLE IF NOT EXISTS files (
     encryption_algorithm TEXT NOT NULL DEFAULT 'AES-256-GCM',
     encryption_version INTEGER NOT NULL DEFAULT 1,
     original_sha256 TEXT NOT NULL,
+    nonce BLOB,
+    key_nonce BLOB,
+    wrapped_key BLOB,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY(owner_id)
