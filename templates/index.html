@@ -1,0 +1,52 @@
+
+{% extends "base.html" %}
+
+{% block title %}Welcome | SentinelVault{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+
+    <div class="status">
+        <span class="status-dot"></span>
+        SYSTEM INITIALIZED
+    </div>
+
+    <h1>Your Files.<br>
+        <span>Your Security.</span>
+    </h1>
+
+    <p>
+        A secure file protection platform powered by
+        AES-256-GCM encryption, integrity verification
+        and intelligent access control.
+    </p>
+
+    <div class="features">
+
+        <div class="feature-card">
+            <h3>01 / ENCRYPTION</h3>
+            <p>AES-256-GCM authenticated file encryption.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>02 / INTEGRITY</h3>
+            <p>Cryptographic verification and tampering detection.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>03 / ACCESS CONTROL</h3>
+            <p>Secure authentication and role-based permissions.</p>
+        </div>
+
+    </div>
+
+    <div class="system-info">
+        <span>FLASK BACKEND</span>
+        <span>SQLITE DATABASE</span>
+        <span>PYTHON SECURITY ENGINE</span>
+    </div>
+
+</section>
+
+{% endblock %}

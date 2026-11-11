@@ -1,0 +1,40 @@
+
+{% extends "base.html" %}
+
+{% block title %}Register | SentinelVault{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Create Account</h2>
+        <p>Secure your digital assets with SentinelVault.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <label>Username</label>
+            <input type="text" name="username" maxlength="50" required>
+
+            <label>Email</label>
+            <input type="email" name="email" maxlength="254" required>
+
+            <label>Password</label>
+            <input type="password" name="password"
+                   minlength="12" maxlength="128" required>
+
+            <button type="submit">Create Account</button>
+        </form>
+
+        <p class="auth-link">
+            Already registered?
+            <a href="{{ url_for('auth.login') }}">Login</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

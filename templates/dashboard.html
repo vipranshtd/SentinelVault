@@ -1,0 +1,41 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard | SentinelVault{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-heading">
+        <div>
+            <div class="status">
+                <span class="status-dot"></span>
+                AUTHENTICATED SESSION
+            </div>
+            <h1>Welcome, <span>{{ current_user.username }}</span></h1>
+            <p>Your secure workspace is ready.</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.logout') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="logout-button">Logout</button>
+        </form>
+    </div>
+
+    <div class="features">
+        <div class="feature-card">
+            <h3>FILE ENCRYPTION</h3>
+            <p>Secure your files with AES-256-GCM.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>INTEGRITY MONITOR</h3>
+            <p>Detect unauthorized file modifications.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>ACCESS CONTROL</h3>
+            <p>Account role: {{ current_user.role|upper }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
