@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block title %}Dashboard | SentinelVault{% endblock %}
@@ -35,6 +34,18 @@
         <div class="feature-card">
             <h3>ACCESS CONTROL</h3>
             <p>Account role: {{ current_user.role|upper }}</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>MY PROTECTED FILES</h3>
+            <p>View, download and manage encrypted files.</p>
+            <a href="{{ url_for('files.file_list') }}">Open File Explorer</a>
+        </div>
+
+        <div class="feature-card">
+            <h3>UPLOAD & ENCRYPT</h3>
+            <p>Protect a new document using AES-256-GCM.</p>
+            <a href="{{ url_for('files.upload') }}">Upload File</a>
         </div>
     </div>
 </div>

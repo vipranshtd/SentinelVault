@@ -1,0 +1,76 @@
+
+{% extends "base.html" %}
+
+{% block title %}My Files | SentinelVault{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-container">
+
+    <div class="dashboard-heading">
+        <div>
+            <div class="status">
+                <span class="status-dot"></span>
+                ENCRYPTED STORAGE
+            </div>
+
+            <h1>My <span>Files</span></h1>
+            <p>Manage your protected documents.</p>
+        </div>
+
+        <a href="{{ url_for('files.upload') }}" class="upload-button">
+            + Upload File
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="message {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <div class="file-list">
+
+        {% if files %}
+            {% for file in files %}
+                <div class="file-card">
+                    <div>
+                        <h3>{{ file.display_filename }}</h3>
+                        <p>Original size: {{ "%.2f"|format(file.original_size / 1024) }} KB</p>
+                        <p>Encrypted size: {{ "%.2f"|format(file.encrypted_size / 1024) }} KB</p>
+                        <p>Algorithm: {{ file.encryption_algorithm }}</p>
+                        <p>Uploaded: {{ file.created_at }}</p>
+                        <span class="encrypted-label">ENCRYPTED</span>
+                    </div>
+
+                    <div class="file-actions">
+                        <a class="download-button"
+                           href="{{ url_for('files.download', file_id=file.file_id) }}">
+                            Download & Decrypt
+                        </a>
+
+                        <form method="POST"
+                              action="{{ url_for('files.remove', file_id=file.file_id) }}"
+                              onsubmit="return confirm('Delete this protected file?');">
+
+                            <input type="hidden" name="csrf_token"
+                                   value="{{ csrf_token() }}">
+
+                            <button class="delete-button" type="submit">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="feature-card">
+                <h3>No Protected Files</h3>
+                <p>Upload your first file to get started.</p>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

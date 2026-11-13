@@ -13,6 +13,7 @@ from database.db_manager import get_db
 from core.user import User
 from routes.auth_routes import auth
 
+from routes.file_routes import files
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -69,6 +70,7 @@ init_db_app(app)
 
 # Register authentication routes
 app.register_blueprint(auth)
+app.register_blueprint(files)
 
 # Apply login rate limiting
 app.view_functions["auth.login"] = limiter.limit("10 per minute")(
