@@ -17,6 +17,8 @@ from services.file_service import (
 )
 from services.audit_service import log_event
 
+from services.file_service import verify_file_integrity
+
 files = Blueprint("files", __name__)
 
 @files.route("/files")
@@ -127,4 +129,28 @@ def remove(file_id):
         current_app.logger.exception("File deletion failed")
         flash("Unable to delete file.", "error")
 
+    return redirect(url_for("files.file_list"))
+
+
+
+@files.route("/files/verify/<int:file_id>", methods=["POST"])
+@login_required
+def verify_file(file_id):
+    try:
+        result = verify_file_integrity(file_id, current_user.id)
+    except Exception:
+        current_app.logger.exception("File integrity verification failed")
+        flash(
+            "Integrity verification failed. The file may be corrupted or missing.",
+            "danger"
+        )
+        return redirect(url_for("files.file_list"))
+
+    if result is None:
+        abort(404)
+
+    flash(
+        "Integrity verified: file is authentic and unchanged.",
+        "success"
+    )
     return redirect(url_for("files.file_list"))

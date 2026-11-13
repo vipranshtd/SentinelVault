@@ -1,0 +1,110 @@
+
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | SentinelVault{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+
+    <div class="dashboard-heading">
+        <div>
+            <div class="status">
+                <span class="status-dot"></span>
+                ADMINISTRATOR ACCESS
+            </div>
+            <h1>Admin <span>Dashboard</span></h1>
+            <p>System-wide security and account management.</p>
+        </div>
+
+        <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+    </div>
+
+    <div class="features">
+        <div class="feature-card">
+            <h3>TOTAL USERS</h3>
+            <p>{{ total_users }}</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>ACTIVE USERS</h3>
+            <p>{{ active_users }}</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>PROTECTED FILES</h3>
+            <p>{{ total_files }}</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>AUDIT EVENTS</h3>
+            <p>{{ total_events }}</p>
+        </div>
+    </div>
+
+    <h2>User Management</h2>
+
+    <div class="file-list">
+        {% for user in users %}
+        <div class="file-card">
+            <div>
+                <h3>{{ user.username }}</h3>
+                <p>{{ user.email }}</p>
+                <p>Role: {{ user.role|upper }}</p>
+                <p>
+                    Status:
+                    {% if user.is_active %}
+                        <span class="status-active">ACTIVE</span>
+                    {% else %}
+                        <span class="status-inactive">INACTIVE</span>
+                    {% endif %}
+                </p>
+            </div>
+
+            {% if user.user_id != current_user.id|int %}
+            <form method="POST"
+                  action="{{ url_for('admin.toggle_user', user_id=user.user_id) }}"
+                  onsubmit="return confirm('Change this account status?');">
+
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
+
+                {% if user.is_active %}
+                    <button type="submit" class="delete-button">
+                        Deactivate
+                    </button>
+                {% else %}
+                    <button type="submit" class="download-button">
+                        Activate
+                    </button>
+                {% endif %}
+            </form>
+            {% else %}
+                <span>Current account</span>
+            {% endif %}
+        </div>
+        {% else %}
+        <p>No users found.</p>
+        {% endfor %}
+    </div>
+
+    <h2>Recent Security Events</h2>
+
+    <div class="file-list">
+        {% for event in recent_events %}
+        <div class="file-card">
+            <div>
+                <h3>{{ event.event_type }}</h3>
+                <p>Actor: {{ event.username or "System / Unknown" }}</p>
+                <p>Outcome: {{ event.outcome }}</p>
+                <p>Time: {{ event.created_at }}</p>
+                <p>{{ event.details or "" }}</p>
+            </div>
+        </div>
+        {% else %}
+        <p>No security events recorded yet.</p>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

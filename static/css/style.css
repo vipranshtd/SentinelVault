@@ -354,3 +354,41 @@ footer {
         flex-wrap: wrap;
     }
 }
+
+
+.status-active {
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.status-inactive {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.file-list {
+    display: grid;
+    gap: 15px;
+    margin: 20px 0 35px;
+}
+
+.file-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 12px;
+}
+
+.file-card p {
+    margin: 5px 0;
+}
+
+@media (max-width: 600px) {
+    .file-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

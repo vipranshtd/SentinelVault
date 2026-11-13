@@ -12,8 +12,9 @@ from database.db_manager import init_db, init_app as init_db_app
 from database.db_manager import get_db
 from core.user import User
 from routes.auth_routes import auth
-
 from routes.file_routes import files
+from routes.admin_routes import admin
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -38,11 +39,11 @@ def load_user(user_id):
         return None
 
     return User(
-    user["user_id"],
-    user["username"],
-    user["email"],
-    user["role"]
-)
+        user["user_id"],
+        user["username"],
+        user["email"],
+        user["role"]
+    )
 
 
 # Security components
@@ -68,9 +69,11 @@ init_db(app.config["DATABASE_PATH"])
 init_db_app(app)
 
 
-# Register authentication routes
+# Register blueprints
 app.register_blueprint(auth)
 app.register_blueprint(files)
+app.register_blueprint(admin)
+
 
 # Apply login rate limiting
 app.view_functions["auth.login"] = limiter.limit("10 per minute")(

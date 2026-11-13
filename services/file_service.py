@@ -209,3 +209,67 @@ def delete_file(file_id, user_id):
         current_app.logger.exception("Failed to record deletion event")
 
     return True
+
+
+
+def verify_file_integrity(file_id, user_id):
+    db = get_db()
+
+    record = db.execute(
+        """
+        SELECT * FROM files
+        WHERE file_id = ? AND owner_id = ?
+        """,
+        (file_id, user_id)
+    ).fetchone()
+
+    if record is None:
+        return None
+
+    storage_path = (
+        Path(current_app.config["STORAGE_PATH"])
+        / f"{record['storage_id']}.svault"
+    )
+
+    try:
+        if not storage_path.is_file():
+            raise FileNotFoundError("Encrypted file is missing.")
+
+        encrypted_data = storage_path.read_bytes()
+
+        # Decryption verifies the AES-GCM authentication tag
+        # and compares the recovered file's SHA-256 fingerprint.
+        decrypt_file(
+            encrypted_data,
+            record["nonce"],
+            record["key_nonce"],
+            record["wrapped_key"],
+            record["storage_id"],
+            record["original_sha256"]
+        )
+
+        log_event(
+            "FILE_INTEGRITY_CHECK",
+            "SUCCESS",
+            user_id,
+            file_id,
+            "File integrity verified successfully"
+        )
+
+        return True
+
+    except Exception:
+        try:
+            log_event(
+                "FILE_INTEGRITY_CHECK",
+                "FAILURE",
+                user_id,
+                file_id,
+                "File integrity verification failed"
+            )
+        except Exception:
+            current_app.logger.exception(
+                "Failed to record integrity verification event"
+            )
+
+        raise

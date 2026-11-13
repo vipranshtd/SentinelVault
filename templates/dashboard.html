@@ -47,6 +47,19 @@
             <p>Protect a new document using AES-256-GCM.</p>
             <a href="{{ url_for('files.upload') }}">Upload File</a>
         </div>
+
+
+        {% if current_user.role == "admin" %}
+        <div class="feature-card">
+            <h3>ADMINISTRATION</h3>
+            <p>Manage accounts and monitor system-wide security activity.</p>
+            <a href="{{ url_for('admin.dashboard') }}">
+                Open Admin Dashboard
+            </a>
+        </div>
+        {% endif %}
+
+
     </div>
 </div>
 {% endblock %}
