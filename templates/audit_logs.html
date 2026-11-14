@@ -1,0 +1,110 @@
+
+{% extends "base.html" %}
+
+{% block title %}Security Audit Logs | SentinelVault{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+
+    <div class="dashboard-heading">
+        <div>
+            <div class="status">
+                <span class="status-dot"></span>
+                SECURITY MONITORING
+            </div>
+            <h1>Audit <span>History</span></h1>
+            <p>Review recorded security events across SentinelVault.</p>
+        </div>
+
+        <a href="{{ url_for('admin.dashboard') }}">Back to Admin Dashboard</a>
+    </div>
+
+    <div class="feature-card">
+        <h3>RECORDED EVENTS</h3>
+        <p>{{ total }} matching events</p>
+    </div>
+
+    <form method="GET" action="{{ url_for('admin.audit_history') }}"
+          class="audit-filter">
+
+        <label for="event_type">Event type</label>
+        <select name="event_type" id="event_type">
+            <option value="">All event types</option>
+            {% for item in event_types %}
+            <option value="{{ item.event_type }}"
+                {% if selected_event_type == item.event_type %}selected{% endif %}>
+                {{ item.event_type }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <label for="outcome">Outcome</label>
+        <select name="outcome" id="outcome">
+            <option value="">All outcomes</option>
+            <option value="SUCCESS"
+                {% if selected_outcome == "SUCCESS" %}selected{% endif %}>
+                Success
+            </option>
+            <option value="FAILED"
+                {% if selected_outcome == "FAILED" %}selected{% endif %}>
+                Failed
+            </option>
+            <option value="FAILURE"
+                {% if selected_outcome == "FAILURE" %}selected{% endif %}>
+                Failure
+            </option>
+        </select>
+
+        <button type="submit" class="download-button">
+            Apply Filters
+        </button>
+
+        <a href="{{ url_for('admin.audit_history') }}">Clear</a>
+    </form>
+
+    <div class="file-list">
+        {% for event in events %}
+        <div class="file-card">
+            <div>
+                <h3>{{ event.event_type }}</h3>
+                <p>Event ID: {{ event.event_id }}</p>
+                <p>Actor: {{ event.username or "Unknown / System" }}</p>
+                <p>Actor ID: {{ event.actor_id or "N/A" }}</p>
+                <p>File ID: {{ event.file_id or "N/A" }}</p>
+                <p>Outcome: {{ event.outcome }}</p>
+                <p>Time: {{ event.created_at }}</p>
+                <p>{{ event.details or "No additional details" }}</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="feature-card">
+            <h3>No audit events found</h3>
+            <p>Try changing the selected filters.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="audit-pagination">
+        {% if page > 1 %}
+        <a href="{{ url_for(
+            'admin.audit_history',
+            event_type=selected_event_type,
+            outcome=selected_outcome,
+            page=page-1
+        ) }}">Previous</a>
+        {% endif %}
+
+        <span>Page {{ page }} of {{ total_pages }}</span>
+
+        {% if page < total_pages %}
+        <a href="{{ url_for(
+            'admin.audit_history',
+            event_type=selected_event_type,
+            outcome=selected_outcome,
+            page=page+1
+        ) }}">Next</a>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

@@ -1,5 +1,12 @@
 
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import (
+    Blueprint,
+    render_template,
+    redirect,
+    url_for,
+    flash,
+    request
+)
 from flask_login import login_required, current_user
 
 from database.db_manager import get_db
@@ -31,13 +38,45 @@ def dashboard():
         "SELECT COUNT(*) FROM audit_events"
     ).fetchone()[0]
 
+    failed_logins = db.execute(
+        """
+        SELECT COUNT(*) FROM audit_events
+        WHERE event_type = 'LOGIN' AND outcome = 'FAILED'
+        """
+    ).fetchone()[0]
+
+    integrity_failures = db.execute(
+        """
+        SELECT COUNT(*) FROM audit_events
+        WHERE event_type = 'FILE_INTEGRITY_CHECK'
+        AND outcome = 'FAILURE'
+        """
+    ).fetchone()[0]
+
+    uploads = db.execute(
+        """
+        SELECT COUNT(*) FROM audit_events
+        WHERE event_type = 'FILE_UPLOAD_ENCRYPT'
+        AND outcome = 'SUCCESS'
+        """
+    ).fetchone()[0]
+
+    downloads = db.execute(
+        """
+        SELECT COUNT(*) FROM audit_events
+        WHERE event_type = 'FILE_DOWNLOAD_DECRYPT'
+        AND outcome = 'SUCCESS'
+        """
+    ).fetchone()[0]
+
     recent_events = db.execute(
         """
         SELECT audit_events.*, users.username
         FROM audit_events
         LEFT JOIN users
         ON audit_events.actor_id = users.user_id
-        ORDER BY audit_events.created_at DESC
+        ORDER BY audit_events.created_at DESC,
+                 audit_events.event_id DESC
         LIMIT 15
         """
     ).fetchall()
@@ -56,8 +95,93 @@ def dashboard():
         active_users=active_users,
         total_files=total_files,
         total_events=total_events,
+        failed_logins=failed_logins,
+        integrity_failures=integrity_failures,
+        uploads=uploads,
+        downloads=downloads,
         recent_events=recent_events,
         users=users
+    )
+
+
+@admin.route("/audit")
+@login_required
+@admin_required
+def audit_history():
+    db = get_db()
+
+    event_type = request.args.get("event_type", "").strip()[:100]
+    outcome = request.args.get("outcome", "").strip().upper()
+
+    allowed_outcomes = {"SUCCESS", "FAILED", "FAILURE"}
+
+    if outcome not in allowed_outcomes:
+        outcome = ""
+
+    page = request.args.get("page", 1, type=int)
+    page = max(page or 1, 1)
+
+    per_page = 25
+    offset = (page - 1) * per_page
+
+    conditions = []
+    parameters = []
+
+    if event_type:
+        conditions.append("audit_events.event_type = ?")
+        parameters.append(event_type)
+
+    if outcome:
+        conditions.append("audit_events.outcome = ?")
+        parameters.append(outcome)
+
+    where_clause = ""
+
+    if conditions:
+        where_clause = "WHERE " + " AND ".join(conditions)
+
+    total = db.execute(
+        f"""
+        SELECT COUNT(*)
+        FROM audit_events
+        {where_clause}
+        """,
+        parameters
+    ).fetchone()[0]
+
+    events = db.execute(
+        f"""
+        SELECT audit_events.*, users.username
+        FROM audit_events
+        LEFT JOIN users
+        ON audit_events.actor_id = users.user_id
+        {where_clause}
+        ORDER BY audit_events.created_at DESC,
+                 audit_events.event_id DESC
+        LIMIT ? OFFSET ?
+        """,
+        (*parameters, per_page, offset)
+    ).fetchall()
+
+    total_pages = max((total + per_page - 1) // per_page, 1)
+
+    event_types = db.execute(
+        """
+        SELECT DISTINCT event_type
+        FROM audit_events
+        ORDER BY event_type
+        """
+    ).fetchall()
+
+    return render_template(
+        "audit_logs.html",
+        events=events,
+        event_types=event_types,
+        selected_event_type=event_type,
+        selected_outcome=outcome,
+        page=page,
+        total_pages=total_pages,
+        total=total
     )
 
 
@@ -91,7 +215,10 @@ def toggle_user(user_id):
         ).fetchone()[0]
 
         if active_admins <= 1:
-            flash("The last active administrator cannot be deactivated.", "error")
+            flash(
+                "The last active administrator cannot be deactivated.",
+                "error"
+            )
             return redirect(url_for("admin.dashboard"))
 
     db.execute(
@@ -112,7 +239,12 @@ def toggle_user(user_id):
         )
     except Exception:
         from flask import current_app
-        current_app.logger.exception("Failed to record administrative action")
+        current_app.logger.exception(
+            "Failed to record administrative action"
+        )
 
-    flash(f"User account {action.lower()} successfully.", "success")
+    flash(
+        f"User account {action.lower()} successfully.",
+        "success"
+    )
     return redirect(url_for("admin.dashboard"))

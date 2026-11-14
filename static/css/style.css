@@ -392,3 +392,42 @@ footer {
         flex-direction: column;
     }
 }
+
+
+
+.audit-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: 25px 0;
+    padding: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 12px;
+}
+
+.audit-filter select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    background: #111827;
+    color: #ffffff;
+}
+
+.audit-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    margin: 25px 0;
+}
+
+.audit-pagination a {
+    color: #38bdf8;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.audit-pagination a:hover {
+    text-decoration: underline;
+}
