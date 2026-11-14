@@ -23,12 +23,14 @@ def app(tmp_path):
     application = app_module.app
 
     application.config.update(
-        TESTING=True,
-        DATABASE_PATH=test_database,
-        STORAGE_PATH=test_storage,
-        WTF_CSRF_ENABLED=False,
-        RATELIMIT_ENABLED=False
+    TESTING=True,
+    DATABASE_PATH=test_database,
+    STORAGE_PATH=test_storage,
+    WTF_CSRF_ENABLED=False,
+    RATELIMIT_ENABLED=False,
+    RATELIMIT_ENABLED_DEFAULT=False
     )
+    app_module.limiter.reset()
 
     db_manager.init_db(test_database)
 
