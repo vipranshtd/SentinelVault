@@ -431,3 +431,103 @@ footer {
 .audit-pagination a:hover {
     text-decoration: underline;
 }
+
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-actions form {
+    margin: 0;
+}
+
+.nav-button {
+    display: inline-block;
+    padding: 10px 16px;
+    border: 1px solid #24384d;
+    border-radius: 7px;
+    color: #dce8f5;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.nav-button:hover,
+.secondary-button:hover {
+    border-color: #22d3ee;
+    color: #22d3ee;
+}
+
+.register-button,
+.primary-button {
+    background: #22d3ee;
+    color: #07111d;
+    border-color: #22d3ee;
+}
+
+.register-button:hover,
+.primary-button:hover {
+    background: #67e8f9;
+    color: #07111d;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 14px;
+    margin-top: 25px;
+    margin-bottom: 38px;
+}
+
+.hero-button {
+    display: inline-block;
+    padding: 13px 21px;
+    border-radius: 7px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    border: 1px solid #22d3ee;
+    transition: 0.2s ease;
+}
+
+.secondary-button {
+    color: #dce8f5;
+    background: transparent;
+}
+
+@media (max-width: 650px) {
+    .navbar {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .nav-right {
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .nav-tag {
+        font-size: 9px;
+    }
+
+    .nav-actions {
+        gap: 6px;
+    }
+
+    .nav-button {
+        padding: 8px 10px;
+        font-size: 10px;
+    }
+}
